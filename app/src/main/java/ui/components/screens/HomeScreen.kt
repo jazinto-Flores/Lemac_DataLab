@@ -1,4 +1,5 @@
-package ui.components.screens
+package com.example.autoregistroapp.ui.screens
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -6,13 +7,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ejemplo.autodiario.ui.components.PrimaryButton
-import com.ejemplo.autodiario.ui.components.RecordCard
-import com.ejemplo.autodiario.viewmodel.RegistroViewModel
+import com.example.autoregistroapp.ui.components.RecordCard
+import com.example.autoregistroapp.viewmodel.RegistroViewModel
 
 @Composable
-fun HomeScreen(viewModel: RegistroViewModel) {
-    val listaRegistros by viewModel.registros.collectAsState()
+fun HomeScreen(
+    viewModel: RegistroViewModel,
+    onNavigateToRegister: () -> Unit
+) {
+    val registros by viewModel.registros.collectAsState()
 
     Column(
         modifier = Modifier
@@ -26,7 +29,7 @@ fun HomeScreen(viewModel: RegistroViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Card de Exclusión Clínica / Emergencias
+        // Banner Exclusión Clínica
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
             modifier = Modifier.fillMaxWidth()
@@ -40,31 +43,26 @@ fun HomeScreen(viewModel: RegistroViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón de acción para simular nuevo registro
-        PrimaryButton(
-            text = "Simular Nuevo Registro (+ Ánimo)",
-            onClick = {
-                viewModel.agregarRegistro("Estado de Ánimo", "Registro rápido realizado", 4)
-            }
-        )
+        Button(
+            onClick = onNavigateToRegister,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("+ Nuevo Autorregistro")
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = "Historial Reciente",
-            style = MaterialTheme.typography.titleLarge
-        )
+        Text(text = "Historial Reciente", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Listado de registros utilizando LazyColumn
         LazyColumn {
-            items(listaRegistros) { item ->
+            items(registros) { item ->
                 RecordCard(
-                    ambito = item.ambito,
-                    detalle = item.detalle,
+                    ambito = item.ambito.name,
+                    detalle = "${item.emocionOImpulso} (${item.contexto}) - ${item.notas}",
                     intensidad = item.intensidad,
-                    fecha = item.fecha
+                    fecha = item.fechaHora
                 )
             }
         }

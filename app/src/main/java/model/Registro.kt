@@ -1,11 +1,20 @@
-package model
+package com.example.autoregistroapp.model
 
 import java.util.UUID
 
+enum class Ambito {
+    ESTADO_ANIMO,
+    NEURODESARROLLO,
+    DBT,
+    ADICCIONES
+}
+
 data class Registro(
     val id: String = UUID.randomUUID().toString(),
-    val ambito: String,
-    val detalle: String,
+    val ambito: Ambito,
+    val emocionOImpulso: String,
     val intensidad: Int,
-    val fecha: String
+    val contexto: String,
+    val notas: String = "",
+    val fechaHora: String
 )
