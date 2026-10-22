@@ -21,10 +21,6 @@ data class ReminderConfig(
     val minuto: Int = 0
 )
 
-/**
- * Persistencia local con DataStore (Preferences). Los registros se guardan como JSON.
- * Solo datos ficticios/sintéticos: nada sale del dispositivo.
- */
 class RegistroRepository(private val context: Context) {
 
     private companion object {
@@ -70,7 +66,6 @@ class RegistroRepository(private val context: Context) {
         }
     }
 
-    /** Carga una sola vez algunos registros sintéticos para poder probar la app. */
     suspend fun sembrarDatosSinteticosSiCorresponde() {
         context.dataStore.edit { prefs ->
             if (prefs[KEY_SEMBRADO] == true) return@edit
