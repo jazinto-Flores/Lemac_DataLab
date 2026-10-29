@@ -15,6 +15,5 @@ Pantalla → ViewModel → Repository → DAO → Room (SQLite)
 - `navigation/` NavHost con transiciones animadas
 - `notifications/` recordatorios locales (recurso nativo)
 
-## Avance
-- Semana 9: navegación, formularios y validaciones, ViewModel, estado, animaciones, notificaciones.
+
 - Semana 10: Room (Entity, DAO con CRUD, Database), Repository, corrutinas y persistencia real.
