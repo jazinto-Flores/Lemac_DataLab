@@ -20,6 +20,7 @@ data class RegistroFormState(
     val esEdicion: Boolean get() = editandoId != null
 }
 
+/** Reglas de validación del formulario (puras, fáciles de probar con tests unitarios). */
 object Validador {
     fun emocion(valor: String): String? =
         if (valor.isBlank()) "Selecciona una opción" else null
@@ -44,6 +45,7 @@ fun RegistroFormState.esValido(): Boolean =
             Validador.intensidad(intensidad) == null &&
             Validador.notas(notas) == null
 
+/** Devuelve el estado con TODOS los errores calculados (se usa al presionar Guardar). */
 fun RegistroFormState.conErrores(): RegistroFormState = copy(
     emocionError = Validador.emocion(emocionOImpulso),
     contextoError = Validador.contexto(contexto),

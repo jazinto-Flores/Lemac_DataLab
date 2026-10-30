@@ -5,9 +5,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-
-enum class Ambito(val etiqueta: String){
-    ESTADO_ANIMO("Estado de animo"),
+enum class Ambito(val etiqueta: String) {
+    ESTADO_ANIMO("Estado de ánimo"),
     NEURODESARROLLO("Neurodesarrollo"),
     DBT("Habilidades DBT"),
     ADICCIONES("Adicciones")
@@ -24,24 +23,25 @@ data class Registro(
 )
 
 fun Long.formatoFecha(): String =
-    SimpleDateFormat("dd/MM/yyy HH:mm", Locale.getDefault()).format(Date(this))
+    SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(this))
 
+/** Catálogo sintético de opciones predefinidas por ámbito (solo datos ficticios). */
 object Catalogo {
     val opciones: Map<Ambito, List<String>> = mapOf(
         Ambito.ESTADO_ANIMO to listOf(
-            "Tranquilidad", "Alegria", "Tristeza", "Enojo", "Cansancio"
+            "Tranquilidad", "Alegría", "Tristeza", "Ansiedad", "Enojo", "Cansancio"
         ),
         Ambito.NEURODESARROLLO to listOf(
             "Sobrecarga sensorial", "Dificultad para organizarme", "Rutina cumplida",
-            "Distraccion", "Autorregulacion lograda"
+            "Distracción", "Autorregulación lograda"
         ),
         Ambito.DBT to listOf(
-            "Mindfulness", "Tolerancia al malestar", "Regulacion emocional",
+            "Mindfulness", "Tolerancia al malestar", "Regulación emocional",
             "Efectividad interpersonal"
         ),
         Ambito.ADICCIONES to listOf(
             "Impulso / craving", "Desencadenante identificado",
-            "Accion protectora realizada", "Objetivo de prueba cumplido"
+            "Acción protectora realizada", "Objetivo de prueba cumplido"
         )
     )
 }

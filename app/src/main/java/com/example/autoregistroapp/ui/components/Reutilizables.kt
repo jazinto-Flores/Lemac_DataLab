@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Componente 1: Botón primario reutilizable
 @Composable
 fun PrimaryButton(
     text: String,
@@ -31,6 +32,7 @@ fun PrimaryButton(
     }
 }
 
+// Componente 2: Tarjeta de registro reutilizable (con editar / eliminar y barra de intensidad animada)
 @Composable
 fun RecordCard(
     ambito: String,
@@ -43,6 +45,7 @@ fun RecordCard(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Animación con propósito: la barra de intensidad se llena al aparecer el registro
     val progreso by animateFloatAsState(
         targetValue = intensidad / 5f,
         animationSpec = tween(durationMillis = 600),
