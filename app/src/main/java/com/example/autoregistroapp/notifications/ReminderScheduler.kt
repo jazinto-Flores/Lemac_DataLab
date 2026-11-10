@@ -36,10 +36,11 @@ object ReminderScheduler {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val canal = NotificationChannel(
                 CHANNEL_ID, "Recordatorios", NotificationManager.IMPORTANCE_DEFAULT
-            ).apply { description = "Recordatorios discretos para tu autorregistro" }
+            ).apply {
+                description = "Recordatorios discretos para tu autorregistro"
+                lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
+            }
             context.getSystemService(NotificationManager::class.java).createNotificationChannel(canal)
-            lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
-
         }
     }
 
