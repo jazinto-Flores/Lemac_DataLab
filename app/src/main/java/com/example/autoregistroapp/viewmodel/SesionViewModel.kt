@@ -5,20 +5,28 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.autoregistroapp.data.CuentasDemo
+import com.example.autoregistroapp.data.ApiSimulada
 import com.example.autoregistroapp.data.FotoPerfilRepository
 import com.example.autoregistroapp.data.Sesion
 import com.example.autoregistroapp.data.SesionRepository
+import com.example.autoregistroapp.model.TextosLegales
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SesionViewModel(application: Application) : AndroidViewModel(application) {
+
+    private companion object {
+        const val LIMITE_INACTIVIDAD_MS = 5 * 60 * 1000L   // 5 minutos (2.2)
+    }
 
     private val sesionRepository = SesionRepository(application.applicationContext)
     private val fotoRepository = FotoPerfilRepository(application.applicationContext)
@@ -36,8 +44,38 @@ class SesionViewModel(application: Application) : AndroidViewModel(application) 
     private val _mensajeFoto = MutableStateFlow<String?>(null)
     val mensajeFoto: StateFlow<String?> = _mensajeFoto.asStateFlow()
 
+    private var ultimaActividad = System.currentTimeMillis()
+
     init {
         viewModelScope.launch { _foto.value = fotoRepository.cargar() }
+
+        // Cierre automático por inactividad: mientras haya sesión, revisa cada 10 s
+        viewModelScope.launch {
+            sesion.map { it?.activa == true }.distinctUntilChanged().collectLatest { activa ->
+                if (!activa) return@collectLatest
+                ultimaActividad = System.currentTimeMillis()
+                while (true) {
+                    delay(10_000)
+                    if (System.currentTimeMillis() - ultimaActividad >= LIMITE_INACTIVIDAD_MS) {
+                        sesionRepository.cerrar()
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    // ---------- Inactividad / segundo plano ----------
+    /** La Activity lo llama en cada toque. */
+    fun registrarActividad() { ultimaActividad = System.currentTimeMillis() }
+
+    /** Al volver a la app: si pasaron 5 min o más desde la última actividad, cierra sesión. */
+    fun alVolver() {
+        if (sesion.value?.activa == true &&
+            System.currentTimeMillis() - ultimaActividad >= LIMITE_INACTIVIDAD_MS
+        ) {
+            viewModelScope.launch { sesionRepository.cerrar() }
+        }
     }
 
     // ---------- Login ----------
@@ -53,7 +91,7 @@ class SesionViewModel(application: Application) : AndroidViewModel(application) 
         _login.update { it.copy(mostrarClave = mostrar) }
     }
 
-    /** Valida los campos, comprueba la cuenta ficticia y guarda la sesión. */
+    /** Valida, pide el token a la API simulada y guarda la sesión (token cifrado). */
     fun iniciarSesion(onExito: () -> Unit) {
         val actual = _login.value
         val aliasError = ValidadorLogin.alias(actual.alias)
@@ -64,24 +102,40 @@ class SesionViewModel(application: Application) : AndroidViewModel(application) 
         }
         viewModelScope.launch {
             _login.update { it.copy(cargando = true, errorGeneral = null) }
-            delay(600) // simula la espera de un servicio de autenticación
-            if (CuentasDemo.credencialesValidas(actual.alias, actual.clave)) {
-                sesionRepository.iniciar(actual.alias.trim().lowercase())
+            val alias = actual.alias.trim().lowercase()
+            val token = ApiSimulada.login(alias, actual.clave)
+            if (token != null) {
+                sesionRepository.iniciar(alias, token)
                 _login.value = LoginState()
+                ultimaActividad = System.currentTimeMillis()
                 onExito()
             } else {
-                _login.update {
-                    it.copy(cargando = false, errorGeneral = "Usuario o contraseña incorrectos")
-                }
+                _login.update { it.copy(cargando = false, errorGeneral = "Usuario o contraseña incorrectos") }
             }
         }
     }
 
-    fun cerrarSesion(onListo: () -> Unit) {
+    fun cerrarSesion(onListo: () -> Unit = {}) {
         viewModelScope.launch {
             sesionRepository.cerrar()
             onListo()
         }
+    }
+
+    // ---------- Consentimiento informado (2.1) ----------
+    fun aceptarConsentimiento(usoEstudios: Boolean) {
+        val s = sesion.value ?: return
+        viewModelScope.launch {
+            runCatching { ApiSimulada.aceptarConsentimiento(s.token, TextosLegales.VERSION, usoEstudios) }
+            sesionRepository.guardarConsentimiento(
+                s.alias, TextosLegales.VERSION, System.currentTimeMillis(), usoEstudios
+            )
+        }
+    }
+
+    fun cambiarUsoEstudios(valor: Boolean) {
+        val s = sesion.value ?: return
+        viewModelScope.launch { sesionRepository.cambiarEstudios(s.alias, valor) }
     }
 
     // ---------- Foto de perfil ----------
@@ -105,11 +159,6 @@ class SesionViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun avisarFoto(texto: String) {
-        _mensajeFoto.value = texto
-    }
-
-    fun limpiarMensajeFoto() {
-        _mensajeFoto.value = null
-    }
+    fun avisarFoto(texto: String) { _mensajeFoto.value = texto }
+    fun limpiarMensajeFoto() { _mensajeFoto.value = null }
 }

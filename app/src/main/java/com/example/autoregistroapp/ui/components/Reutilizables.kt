@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-// Componente 1: Botón primario reutilizable
 @Composable
 fun PrimaryButton(
     text: String,
@@ -32,26 +31,24 @@ fun PrimaryButton(
     }
 }
 
-// Componente 2: Tarjeta de registro reutilizable (con editar / eliminar y barra de intensidad animada)
+/** Tarjeta de registro: muestra «editado» si fue corregido; eliminar pide confirmación en la pantalla. */
 @Composable
 fun RecordCard(
     ambito: String,
-    titulo: String,
-    contexto: String,
+    lineas: List<String>,
     notas: String,
-    intensidad: Int,
+    progreso: Float,
     fecha: String,
+    editado: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Animación con propósito: la barra de intensidad se llena al aparecer el registro
-    val progreso by animateFloatAsState(
-        targetValue = intensidad / 5f,
+    val animado by animateFloatAsState(
+        targetValue = progreso,
         animationSpec = tween(durationMillis = 600),
         label = "intensidad"
     )
-
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -59,39 +56,31 @@ fun RecordCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = ambito, style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary)
-                    Text(text = titulo, style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = ambito,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = fecha + if (editado) " · editado" else "",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Editar registro")
+                    Icon(Icons.Default.Edit, contentDescription = "Corregir registro")
                 }
                 IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = "Eliminar registro")
                 }
             }
-            Text(text = "Contexto: $contexto", style = MaterialTheme.typography.bodyMedium)
+            lineas.forEach { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
             if (notas.isNotBlank()) {
-                Text(text = notas, style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Notas: $notas", style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LinearProgressIndicator(
-                progress = { progreso },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Intensidad: $intensidad/5", style = MaterialTheme.typography.bodySmall)
-                Text(text = fecha, style = MaterialTheme.typography.bodySmall)
-            }
+            LinearProgressIndicator(progress = { animado }, modifier = Modifier.fillMaxWidth())
         }
     }
 }

@@ -38,6 +38,8 @@ object ReminderScheduler {
                 CHANNEL_ID, "Recordatorios", NotificationManager.IMPORTANCE_DEFAULT
             ).apply { description = "Recordatorios discretos para tu autorregistro" }
             context.getSystemService(NotificationManager::class.java).createNotificationChannel(canal)
+            lockscreenVisibility = android.app.Notification.VISIBILITY_SECRET
+
         }
     }
 
@@ -94,8 +96,8 @@ object ReminderScheduler {
 
         val notificacion = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Lemac DataLab")
-            .setContentText("Tienes un momento para tu registro de hoy.")
+            .setContentTitle("Recordatorio")
+            .setContentText("Tienes un recordatorio pendiente.")
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setContentIntent(abrirApp)
             .setAutoCancel(true)

@@ -124,14 +124,13 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
-            Text("Privacidad y alcance del MVP", style = MaterialTheme.typography.titleLarge)
             Text("• Todos los datos son ficticios o sintéticos.", style = MaterialTheme.typography.bodyMedium)
-            Text("• Los registros se guardan solo en este dispositivo.", style = MaterialTheme.typography.bodyMedium)
-            Text("• Puedes editar o eliminar cualquiera de tus registros.", style = MaterialTheme.typography.bodyMedium)
-            Text("• No se solicitan nombres, RUT, contacto ni datos clínicos.", style = MaterialTheme.typography.bodyMedium)
+            Text("• Tus registros se guardan cifrados en este dispositivo y se sincronizan con un servidor simulado.", style = MaterialTheme.typography.bodyMedium)
+            Text("• Puedes corregir o eliminar tus registros; se conserva el historial de versiones.", style = MaterialTheme.typography.bodyMedium)
+            Text("• Las alertas por valores críticos se muestran dentro de la app, nunca como notificación.", style = MaterialTheme.typography.bodyMedium)
             Text(
                 "• La app no diagnostica, no indica tratamientos ni reemplaza a un profesional. " +
-                        "No es un servicio de urgencia.",
+                        "No es un servicio de urgencia y nadie revisa tus registros en tiempo real.",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

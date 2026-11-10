@@ -5,7 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [RegistroEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [RegistroEntity::class, VersionRegistroEntity::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun registroDao(): RegistroDao
@@ -20,7 +24,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "lemac_datalab.db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration(true) // solo hay datos ficticios
+                    .build().also { INSTANCE = it }
             }
     }
 }

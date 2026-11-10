@@ -1,5 +1,6 @@
 package com.example.autoregistroapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Oculta el contenido en la vista de apps recientes (recomendado por la contraparte).
+        // No se usa FLAG_SECURE para no bloquear la grabación de pantalla del video.
+        if (Build.VERSION.SDK_INT >= 33) setRecentsScreenshotEnabled(false)
         ReminderScheduler.crearCanal(this)
         setContent {
             AutoRegistroAppTheme {
@@ -31,5 +35,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Cada toque cuenta como actividad (inactividad máxima: 5 min)
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        sesionViewModel.registrarActividad()
+    }
+
+    // Al volver de segundo plano: si pasaron 5 min o más, se cierra la sesión
+    override fun onStart() {
+        super.onStart()
+        sesionViewModel.alVolver()
     }
 }
