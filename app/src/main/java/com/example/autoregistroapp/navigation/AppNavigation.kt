@@ -33,6 +33,7 @@ import com.example.autoregistroapp.ui.screens.RegistroHoyScreen
 import com.example.autoregistroapp.ui.screens.SettingsScreen
 import com.example.autoregistroapp.viewmodel.RegistroViewModel
 import com.example.autoregistroapp.viewmodel.SesionViewModel
+import com.example.autoregistroapp.ui.screens.CatalogosScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -40,6 +41,8 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Profile : Screen("profile")
     object Settings : Screen("settings")
+
+    object Catalogos : Screen("catalogos")
     object MisDatos : Screen("misdatos")
     object RegistroHoy : Screen("hoy")
     object Modulo : Screen("modulo/{ambito}?fecha={fecha}") {
@@ -176,18 +179,14 @@ fun AppNavigation(
             )
         }
         composable(Screen.Settings.route) {
-            SettingsScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
-        }
-        composable(Screen.Profile.route) {
-            ProfileScreen(
-                viewModel = sesionViewModel,
+            SettingsScreen(
+                viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onCerrarSesion = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(navController.graph.id) { inclusive = true }
-                    }
-                }
+                onCatalogos = { navController.navigate(Screen.Catalogos.route) }
             )
+        }
+        composable(Screen.Catalogos.route) {
+            CatalogosScreen(onBack = { navController.popBackStack() })
         }
     }
 }

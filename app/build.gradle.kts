@@ -59,6 +59,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    // Retrofit (T3: consumo de API REST con GET + JSON)
+    implementation(platform(libs.retrofit.bom))
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
 
     // Pruebas
     testImplementation(libs.junit)

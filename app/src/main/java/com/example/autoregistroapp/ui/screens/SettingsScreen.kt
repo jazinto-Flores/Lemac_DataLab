@@ -25,7 +25,8 @@ import com.example.autoregistroapp.viewmodel.RegistroViewModel
 @Composable
 fun SettingsScreen(
     viewModel: RegistroViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onCatalogos: () -> Unit
 ) {
     val context = LocalContext.current
     val config by viewModel.recordatorio.collectAsStateWithLifecycle()
@@ -123,6 +124,15 @@ fun SettingsScreen(
             )
 
             HorizontalDivider()
+
+            OutlinedButton(
+                onClick = onCatalogos,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Ver catálogos (API REST)")
+            }
 
             Text("• Todos los datos son ficticios o sintéticos.", style = MaterialTheme.typography.bodyMedium)
             Text("• Tus registros se guardan cifrados en este dispositivo y se sincronizan con un servidor simulado.", style = MaterialTheme.typography.bodyMedium)
